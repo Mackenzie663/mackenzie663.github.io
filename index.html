@@ -1,0 +1,292 @@
+<!--
+CS4242-Online
+Mac Erickson
+Student ID #1: 000 78 6549
+Assignment #: #1
+Due Date: 09/17/2018
+-->
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>CS4242 Assignment 1</title>
+    <style>
+	    table, th, td
+        {
+            border: 3px solid darkslategrey;
+            border-collapse: collapse;
+        }
+	    th, td
+        {
+            padding: 5px;
+            text-align: left;
+            color: darkslategrey;
+	    }
+        .center
+        {
+            margin: auto;
+            width: 50%;
+            border: 3px solid darkslategrey;
+            padding: 10px;
+        }
+        .world
+        {
+            background-color: lightyellow;
+			width:      70%;
+			height:     75%;
+			border:     solid black;
+			display:    inline-table;
+        }
+        .environment-dirty
+        {
+            background-color: darkslategrey;
+			width:      250px;
+			height:     250px;
+			border:     solid black;
+			display:    inline-block;
+
+        }
+        .environment-clean
+        {
+            background-color: lightslategray;
+			width:      250px;
+			height:     250px;
+			border:     solid black;
+			display:    inline-block;
+        }
+        .robot
+        {
+            height: 50px;
+			width:  50px;
+			border: gray solid 1px;
+			border-radius: 100px;
+			background-color: lightgray;
+			position: absolute;
+            transition: transform 2.0s;
+		}
+        .button
+        {
+            padding: 5px;
+            border-radius: 3px;
+            background-color: lightslategray;
+            color: white;
+            text-decoration: none;
+        }
+    </style>
+  </head>
+  <body>
+
+    <div class="row" style="text-align: center;">
+      <div  id="content">
+        <h1>CS4242 Assignment 1</h1>
+
+        <h2 id="Reflex Agent">Simple Reflex Agent Assignment:</h2>
+        <h3 id="Assignment">To implement a simple reflex agent for the vacuum environment in Exercise 2.8 (Page 63
+textbook). Run the environment with this agent for all possible initial dirt configuration
+and agent locations. Record the performance score for each configuration and the overall
+average score.</h3>
+
+
+        <div id="ruleDiagram">
+          <p>Last Ran Agent Rules of the Vacuum Robot:</p>
+          <p id="Rules"></p>
+        </div>
+
+          <br>
+          <div id="World"class="world">
+              <div id="Room0" class="environment-clean"></div>
+              <div id="Room1" class="environment-clean"></div>
+          </div>
+          <svg width="600" height="20"></svg>
+          <a id="Continue" class="button">Continue</a>
+          <a href="javascript:location.reload()" class="button">Restart</a>
+          <div id="Line">
+              <div id="Robot" class="robot"></div>
+          </div>
+          <svg width="600" height="20"></svg>
+          <h2 id="performance-measures">Performance Scores:</h2>
+          <p>
+            The performance scores for all possible initial dirt configurations and agent locations.
+          </p>
+          <table style="width:75%;" class="center">
+			<tr>
+				<th>Initial Dirt Configurations:</th>
+				<td>Clean - Clean</td>
+				<td>Dirty - Clean</td>
+				<td>Dirty - Dirty</td>
+				<td>Clean - Dirty</td>
+			</tr>
+			<tr>
+				<th>Agent Starting Left:</th>
+                <td id="Left1"></td>
+                <td id="Left2"></td>
+                <td id="Left3"></td>
+                <td id="Left4"></td>
+			</tr>
+			<tr>
+				<th>Agent Starting Right:</th>
+                <td id="Right1"></td>
+                <td id="Right2"></td>
+                <td id="Right3"></td>
+                <td id="Right4"></td>
+			</tr>
+			<tr>
+				<th>Overall Average:</th>
+				<td id="Average" colspan="4" style="text-align: center">0</td>
+			</tr>
+		</table>
+      </div>
+    </div>
+    <script src="vacWorld.js"></script>
+    <script>
+        window.onload = async function()
+        {
+            document.getElementById("Rules").innerText = "Not Started Yet\nPlease Click Continue";
+            await Continue();
+            size = 2; // Variable size
+            for (let i = 0; i < size; i++)
+            {
+                world = new World(size);
+                if (document.getElementById("Room0") != null)
+                {
+                    document.getElementById("Line").appendChild(document.getElementById("Robot"));
+                    document.getElementById("World").removeChild(document.getElementById("Room0"));
+                    document.getElementById("World").removeChild(document.getElementById("Room1"));
+                }
+                for(let y = 0; y < size; y++)
+                {
+                    let aRoom = document.createElement("div");
+                    aRoom.setAttribute('id', 'Room' + y);
+                    aRoom.setAttribute('class', 'environment-clean');
+                    document.getElementById("World").appendChild(aRoom);
+                }
+                let startPosition = i;
+                let outPutGraph = document.getElementById("Left1");
+                for (let j = 0; j < 4; j++)
+                {
+                    world.setStartingRoom(startPosition);
+                    switch(j)
+                    {
+                        case 0:
+                            world.setDirty(0,false);
+                            document.getElementById("Room0").setAttribute('class', 'environment-clean');
+                            world.setDirty(1,false);
+                            document.getElementById("Room1").setAttribute('class', 'environment-clean');
+                            if (startPosition == 0)
+                            {
+                                document.getElementById("Rules").innerText = "CLEAN - CLEAN\nStart Position: Left";
+                                outPutGraph = document.getElementById("Left1");
+                                document.getElementById("Room0").appendChild(document.getElementById("Robot"));
+                            }
+                            else
+                            {
+                                document.getElementById("Rules").innerText = "CLEAN - CLEAN\nStart Position: Right";
+                                outPutGraph = document.getElementById("Right1");
+                                document.getElementById("Room1").appendChild(document.getElementById("Robot"));
+                            }
+                            break;
+                        case 1:
+                            world.setDirty(0,true);
+                            document.getElementById("Room0").setAttribute('class', 'environment-dirty');
+                            world.setDirty(1,false);
+                            document.getElementById("Room1").setAttribute('class', 'environment-clean');
+                            if (startPosition == 0)
+                            {
+                                document.getElementById("Rules").innerText = "DIRTY - CLEAN\nStart Position: Left";
+                                outPutGraph = document.getElementById("Left2");
+                                document.getElementById("Room0").appendChild(document.getElementById("Robot"));
+                            }
+                            else
+                            {
+                                document.getElementById("Rules").innerText = "DIRTY - CLEAN\nStart Position: Right";
+                                outPutGraph = document.getElementById("Right2");
+                                document.getElementById("Room1").appendChild(document.getElementById("Robot"));
+                            }
+                            break;
+                        case 2:
+                            world.setDirty(0,true);
+                            document.getElementById("Room0").setAttribute('class', 'environment-dirty');
+                            world.setDirty(1,true);
+                            document.getElementById("Room1").setAttribute('class', 'environment-dirty');
+                            if (startPosition == 0)
+                            {
+                                document.getElementById("Rules").innerText = "DIRTY - DIRTY\nStart Position: Left";
+                                outPutGraph = document.getElementById("Left3");
+                                document.getElementById("Room0").appendChild(document.getElementById("Robot"));
+                            }
+                            else
+                            {
+                                document.getElementById("Rules").innerText = "DIRTY - DIRTY\nStart Position: Right";
+                                outPutGraph = document.getElementById("Right3");
+                                document.getElementById("Room1").appendChild(document.getElementById("Robot"));
+                            }
+                            break;
+                        case 3:
+                            world.setDirty(0,false);
+                            document.getElementById("Room0").setAttribute('class', 'environment-clean');
+                            world.setDirty(1,true);
+                            document.getElementById("Room1").setAttribute('class', 'environment-dirty');
+                            if (startPosition == 0)
+                            {
+                                document.getElementById("Rules").innerText = "CLEAN - DIRTY\nStart Position: Left";
+                                outPutGraph = document.getElementById("Left4");
+                                document.getElementById("Room0").appendChild(document.getElementById("Robot"));
+                            }
+                            else
+                            {
+                                document.getElementById("Rules").innerText = "CLEAN - DIRTY\nStart Position: Right";
+                                outPutGraph = document.getElementById("Right4");
+                                document.getElementById("Room1").appendChild(document.getElementById("Robot"));
+                            }
+                            break;
+                    }
+                    startTime = performance.now();
+                    while (!checkClean(world))
+                    {
+                        action = reflexAgent(world);
+                        world.action(action);
+                        await sleep(1000);
+                        switch(action)
+                        {
+                            case 'SUCK':
+                                await sleep(500);
+                                document.getElementById("Room" + world.currentRoom).setAttribute('class','environment-clean');
+                                break;
+                            case 'LEFT':
+                                document.getElementById("Room" + world.currentRoom).appendChild(document.getElementById("Robot"));
+                                break;
+                            case 'RIGHT':
+                                document.getElementById("Room" + world.currentRoom).appendChild(document.getElementById("Robot"));
+                                break;
+                        }
+                    }
+                    endTime = performance.now();
+                    outPutGraph.innerText = (endTime - startTime);
+                    document.getElementById("Line").appendChild(document.getElementById("Robot"));
+                    await Continue();
+                }
+
+
+
+            }
+                document.getElementById("Rules").innerText = "FINISHED\nPlease Click Restart To Try Again";
+
+                let avg = parseFloat(0);
+                avg += parseFloat(document.getElementById("Left1").innerText);
+                avg += parseFloat(document.getElementById("Left2").innerText);
+                avg += parseFloat(document.getElementById("Left3").innerText);
+                avg += parseFloat(document.getElementById("Left4").innerText);
+                avg += parseFloat(document.getElementById("Right1").innerText);
+                avg += parseFloat(document.getElementById("Right2").innerText);
+                avg += parseFloat(document.getElementById("Right3").innerText);
+                avg += parseFloat(document.getElementById("Right4").innerText);
+
+                avg = avg/8;
+                document.getElementById("Average").innerText = avg;
+        };
+        function Continue()
+        {
+            return new Promise(resolve => document.getElementById("Continue").addEventListener('click', resolve, { once: true }))
+        }
+    </script>
+  </body>
+</html>
